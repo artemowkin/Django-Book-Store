@@ -1,0 +1,42 @@
+{% extends '_base.html' %}
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block content %}
+<div class="book mb-5">
+    {% if book.cover %}
+        <img width="500px" src="{{ book.cover.url }}" class="mb-4">
+    {% endif %}
+    <h1>{{ book.title }}</h1>
+    <p>{{ book.description }}</p>
+    <p>Author: {{ book.author }}</p>
+    <p>Price: ${{ book.price }}</p>
+
+    <form class="mb-3" action="{% url 'charge' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="stripeAmount" value="{{ stripe_amount }}">
+        <input type="hidden" name="stripeDescription" value="{{ book.title }}">
+        <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="{{ stripe_key }}" data-description="{{ book.title }}" data-amount="{{ stripe_amount }}" data-locale="auto"></script>
+    </form>
+
+    {% if 'books.change_book' in user.get_all_permissions and 'books.delete_book' in user.get_all_permissions %}
+        <div class="mt-2">
+            <a href="{% url 'book_update' book.pk %}">Change</a> |
+            <a href="{% url 'book_delete' book.pk %}">Delete</a>
+        </div>
+    {% endif %}
+</div>
+
+<h2 class="mb-3">Reviews:</h2>
+
+{% if user.is_authenticated %}
+    <a href="{% url 'book_add_review' book.pk %}" class="btn btn-primary mb-4">Add Review</a>
+{% endif %}
+
+{% for review in book.reviews.all %}
+    <div class="review mb-4">
+        <b>{{ review.author.email }} ({{ review.pub_date }})</b>
+        <p>{{ review.review }}</p>
+    </div>
+{% endfor %}
+{% endblock %}

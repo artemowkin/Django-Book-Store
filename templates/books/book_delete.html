@@ -1,0 +1,12 @@
+{% extends '_base.html' %}
+
+{% block title %}Delete {{ book.title }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">Delete {{ book.title }}</h2>
+<p>Are you sure you want to delete book "{{ book.title }}"?</p>
+<form method="POST">
+    {% csrf_token %}
+    <input type="submit" class="btn btn-danger" value="Delete">
+</form>
+{% endblock %}
